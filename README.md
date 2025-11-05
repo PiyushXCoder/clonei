@@ -1,13 +1,13 @@
-<img width="282" height="69" alt="Group 10" src="https://github.com/user-attachments/assets/685c4ee8-c11c-4e41-9274-21b43b4c2d10" />
+<img width="282" height="69" alt="Group 10" src="https://github.com/user-attachments/assets/2758038f-d348-4267-82a8-4d25f200804c" />
 
-# iclone
+# clonei
 
 A CLI tool to clone Git repositories and automatically install dependencies in a single shot.
 
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/soft4dev/iclone/refs/heads/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/soft4dev/clonei/refs/heads/main/scripts/install.sh | sh
 ```
 
 ## Usage
@@ -15,25 +15,25 @@ curl -fsSL https://raw.githubusercontent.com/soft4dev/iclone/refs/heads/main/scr
 ### Basic usage (auto-detect project type)
 
 ```bash
-iclone <repository-url>
+clonei <repository-url>
 ```
 
 Example:
 
 ```bash
-iclone https://github.com/username/my-project.git
+clonei https://github.com/username/my-project.git
 ```
 
 ### Specify project type manually
 
 ```bash
-iclone -p <project-type> <repository-url>
+clonei -p <project-type> <repository-url>
 ```
 
 Example:
 
 ```bash
-iclone -p npm https://github.com/username/my-project.git
+clonei -p npm https://github.com/username/my-project.git
 ```
 
 ## Supported Project Types
