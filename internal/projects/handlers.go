@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/soft4dev/iclone/internal/color"
 )
 
 func GetAvailableProjectTypes() []string {
@@ -32,6 +34,7 @@ func (n npmHandler) Install(projectDir string) error {
 		return fmt.Errorf("npm not found; please install npm and ensure it's on your PATH")
 	}
 
+	color.PrintSuccess("  → Running npm ci...")
 	init := exec.Command("npm", "ci")
 	init.Dir = projectDir
 	init.Stdout = os.Stdout
@@ -49,6 +52,7 @@ func (n pnpmHandler) Install(projectDir string) error {
 		return fmt.Errorf("pnpm not found; please install pnpm and ensure it's on your PATH")
 	}
 
+	color.PrintSuccess("  → Running pnpm install --frozen-lockfile...")
 	init := exec.Command("pnpm", "install", "--frozen-lockfile")
 	init.Dir = projectDir
 	init.Stdout = os.Stdout

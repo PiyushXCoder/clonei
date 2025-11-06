@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/soft4dev/iclone/internal/color"
 	"github.com/soft4dev/iclone/internal/projects"
 	"github.com/spf13/cobra"
 )
@@ -41,6 +42,7 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("project directory '%s' already exists in the current location", projectDirName)
 		}
 
+		color.PrintSuccess("🚀 Cloning repository: %s", repoUrl)
 		gitCloneOutput := exec.Command("git", "clone", repoUrl)
 		gitCloneOutput.Stdout = os.Stdout
 		gitCloneOutput.Stderr = os.Stderr
@@ -62,9 +64,11 @@ var rootCmd = &cobra.Command{
 		if handler == nil {
 			return fmt.Errorf("no handler found for project type '%s'\nAvailable project types: %s", projectType, projects.GetAvailableProjectTypes())
 		}
+		color.PrintSuccess("\n📦 Installing dependencies for %s project...", projectType)
 		if err := handler.Install(projectDirName); err != nil {
 			return err
 		}
+		color.PrintSuccess("✓ Dependencies installed successfully \n")
 
 		if cd {
 			if err := os.Chdir(projectDirName); err != nil {
@@ -72,16 +76,21 @@ var rootCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Println("project: " + projectType)
-		fmt.Println("url: " + args[0])
+		color.PrintSuccess("project: %s", projectType)
+		color.PrintSuccess("url: %s", args[0])
 		return nil
 	},
 	Args: cobra.ExactArgs(1),
 }
 
 func Execute() {
+	// Silence Cobra's default error printing
+	rootCmd.SilenceErrors = true
+	rootCmd.SilenceUsage = true
+
 	err := rootCmd.Execute()
 	if err != nil {
+		color.PrintError(err)
 		os.Exit(1)
 	}
 }
