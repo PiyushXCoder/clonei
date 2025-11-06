@@ -129,14 +129,23 @@ install_binary() {
                     echo "# Added by ${BIN_NAME} installer" >> "$shell_profile"
                     echo "export PATH=\"\$PATH:${bin_dir}\"" >> "$shell_profile"
                     printf "${GREEN}✓ Added to ${shell_profile}${NC}\n"
+                    
+                    # Source the profile to apply changes immediately
+                    if [ -f "$shell_profile" ]; then
+                        # shellcheck disable=SC1090
+                        . "$shell_profile" 2>/dev/null || true
+                        printf "${GREEN}✓ PATH updated in current session${NC}\n"
+                    fi
                 else
                     printf "${YELLOW}PATH already configured in ${shell_profile}${NC}\n"
                 fi
             fi
 
-            printf "\n${YELLOW}Please restart your terminal or run:${NC}\n"
-            printf "  source ${shell_profile}\n\n"
-            printf "Then run '${BIN_NAME} --help' to get started\n"
+            # Export PATH for current session as fallback
+            export PATH="$PATH:${bin_dir}"
+            
+            printf "\n${GREEN}Run '${BIN_NAME} --help' to get started${NC}\n"
+            printf "${YELLOW}Note: You may need to restart other terminal sessions${NC}\n"
             ;;
     esac
 }

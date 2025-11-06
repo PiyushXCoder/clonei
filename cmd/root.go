@@ -22,20 +22,11 @@ var rootCmd = &cobra.Command{
 	Long: `
 		It clones provided repo using git and install dependencies according to project type. eg. npm, pnpm, go, rust....
 	`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if r := checkGitInstalled(); r != nil {
-			fmt.Println("Git is not installed")
-			os.Exit(1)
+			return fmt.Errorf("git is not installed")
 		}
 		repoUrl := args[0]
-		gitCloneOutput := exec.Command("git", "clone", repoUrl)
-		gitCloneOutput.Stdout = os.Stdout
-		gitCloneOutput.Stderr = os.Stderr
-		gitCloneOutput.Stdin = os.Stdin
-		if err := gitCloneOutput.Run(); err != nil {
-			fmt.Println("Error cloning repo:", err)
-			return
-		}
 
 		// Extract the directory name from the repo URL
 		// e.g., "https://github.com/user/repo.git" -> "repo"
@@ -44,37 +35,46 @@ var rootCmd = &cobra.Command{
 			projectDirName = projectDirName[idx+1:]
 		}
 		projectDirName = strings.TrimSuffix(projectDirName, ".git")
+
+		// Check if project directory already exists
+		if _, err := os.Stat(projectDirName); err == nil {
+			return fmt.Errorf("project directory '%s' already exists in the current location", projectDirName)
+		}
+
+		gitCloneOutput := exec.Command("git", "clone", repoUrl)
+		gitCloneOutput.Stdout = os.Stdout
+		gitCloneOutput.Stderr = os.Stderr
+		gitCloneOutput.Stdin = os.Stdin
+		if err := gitCloneOutput.Run(); err != nil {
+			return fmt.Errorf("error cloning repo: %w", err)
+		}
+
 		projectType := ""
 		if project == "AUTO" {
 			var err error
 			if projectType, err = projects.ProjectDetector(projectDirName); err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 		} else {
 			projectType = strings.ToUpper(project)
 		}
 		handler := projects.ProjectHandlers[projectType]
 		if handler == nil {
-			fmt.Printf("Error: No handler found for project type '%s'\n", projectType)
-			fmt.Println("Available project types:", projects.GetAvailableProjectTypes())
-			os.Exit(1)
+			return fmt.Errorf("no handler found for project type '%s'\nAvailable project types: %s", projectType, projects.GetAvailableProjectTypes())
 		}
 		if err := handler.Install(projectDirName); err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			return err
 		}
 
 		if cd {
 			if err := os.Chdir(projectDirName); err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return fmt.Errorf("failed to change directory: %w", err)
 			}
 		}
 
 		fmt.Println("project: " + projectType)
 		fmt.Println("url: " + args[0])
-
+		return nil
 	},
 	Args: cobra.ExactArgs(1),
 }

@@ -1,7 +1,7 @@
 package projects
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 )
@@ -27,27 +27,35 @@ type npmHandler struct{}
 type pnpmHandler struct{}
 
 func (n npmHandler) Install(projectDir string) error {
-	// TODO: check npm command
+	// check npm command exists
+	if _, err := exec.LookPath("npm"); err != nil {
+		return fmt.Errorf("npm not found; please install npm and ensure it's on your PATH")
+	}
+
 	init := exec.Command("npm", "ci")
 	init.Dir = projectDir
 	init.Stdout = os.Stdout
 	init.Stderr = os.Stderr
 	init.Stdin = os.Stdin
 	if err := init.Run(); err != nil {
-		return errors.New("error initializing project")
+		return fmt.Errorf("error initializing project (npm ci): %w", err)
 	}
 
 	return nil
 }
 func (n pnpmHandler) Install(projectDir string) error {
-	// TODO: check pnpm command
+	// check pnpm command exists
+	if _, err := exec.LookPath("pnpm"); err != nil {
+		return fmt.Errorf("pnpm not found; please install pnpm and ensure it's on your PATH")
+	}
+
 	init := exec.Command("pnpm", "install", "--frozen-lockfile")
 	init.Dir = projectDir
 	init.Stdout = os.Stdout
 	init.Stderr = os.Stderr
 	init.Stdin = os.Stdin
 	if err := init.Run(); err != nil {
-		return errors.New("error initializing project")
+		return fmt.Errorf("error initializing project (pnpm install): %w", err)
 	}
 
 	return nil
