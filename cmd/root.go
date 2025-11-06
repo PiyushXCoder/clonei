@@ -12,13 +12,15 @@ import (
 
 var (
 	project string
+	install bool
+	cd      bool
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "iclone",
 	Short: "clone and install deps of project",
 	Long: `
-		It clones provided repo using git and install dependencies according to project type. eg. npm, pnpm, go, rust etc..
+		It clones provided repo using git and install dependencies according to project type. eg. npm, pnpm, go, rust....
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if r := checkGitInstalled(); r != nil {
@@ -62,6 +64,14 @@ var rootCmd = &cobra.Command{
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
+
+		if cd {
+			if err := os.Chdir(projectDirName); err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+		}
+
 		fmt.Println("project: " + projectType)
 		fmt.Println("url: " + args[0])
 
@@ -78,6 +88,8 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringVarP(&project, "project", "p", "AUTO", "Project type (npm, go, rust, etc.). Use AUTO for auto-detection")
+	rootCmd.Flags().BoolVarP(&install, "install", "i", true, "controls whether to install dependencies after clone")
+	rootCmd.Flags().BoolVarP(&cd, "cd", "c", true, "controls whether to change directory into the project folder after clone")
 }
 
 func checkGitInstalled() error {
