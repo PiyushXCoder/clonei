@@ -6,8 +6,16 @@ A CLI tool to clone Git repositories and automatically install dependencies in a
 
 ## Installation
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/soft4dev/clonei/refs/heads/main/scripts/install.sh | sh
+For macOS / Linux
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/soft4dev/clonei/main/scripts/install.sh | sh
+```
+
+For Windows (PowerShell)
+
+```powershell
+irm 'https://raw.githubusercontent.com/soft4dev/clonei/main/scripts/install.ps1' | iex
 ```
 
 ## Usage
