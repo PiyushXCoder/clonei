@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/soft4dev/iclone/internal/color"
-	"github.com/soft4dev/iclone/internal/projects"
+	"github.com/soft4dev/clonei/internal/color"
+	"github.com/soft4dev/clonei/internal/projects"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "iclone",
+	Use:   "clonei",
 	Short: "clone and install deps of project",
 	Long: `
 		It clones provided repo using git and install dependencies according to project type. eg. npm, pnpm, go, rust....

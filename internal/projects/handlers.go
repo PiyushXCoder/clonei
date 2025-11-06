@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/soft4dev/iclone/internal/color"
+	"github.com/soft4dev/clonei/internal/color"
 )
 
 func GetAvailableProjectTypes() []string {

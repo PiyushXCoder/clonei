@@ -1,4 +1,4 @@
-module github.com/soft4dev/iclone
+module github.com/soft4dev/clonei
 
 go 1.25.3
 
