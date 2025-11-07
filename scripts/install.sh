@@ -4,6 +4,12 @@ set -euo pipefail
 
 REPO="soft4dev/clonei"
 BIN_NAME="clonei"
+UPDATE_MODE=false
+
+# Check for update argument
+if [ "${1:-}" = "update" ]; then
+    UPDATE_MODE=true
+fi
 
 # Colors (only if stdout is a terminal)
 if [ -t 1 ]; then
@@ -78,7 +84,11 @@ install_binary() {
         exit 1
     fi
 
-    printf "${GREEN}Installing %s %s...${NC}\n" "$BIN_NAME" "$version"
+    if [ "$UPDATE_MODE" = true ]; then
+        printf "${GREEN}Updating %s to %s...${NC}\n" "$BIN_NAME" "$version"
+    else
+        printf "${GREEN}Installing %s %s...${NC}\n" "$BIN_NAME" "$version"
+    fi
 
     archive_name="${BIN_NAME}_${os}_${arch}.tar.gz"
     download_url="https://github.com/${REPO}/releases/download/${version}/${archive_name}"
@@ -106,18 +116,26 @@ install_binary() {
     # Move binary safely
     target="$bin_dir/$BIN_NAME"
     if [ -f "$target" ]; then
-        printf "${YELLOW}Warning: %s already exists. Overwrite? [y/N]: ${NC}" "$target"
-        read -r reply </dev/tty
-        case "$reply" in
-            [yY]*) ;;
-            *) printf "${RED}Installation aborted.${NC}\n"; exit 1 ;;
-        esac
+        if [ "$UPDATE_MODE" = true ]; then
+            printf "${YELLOW}Updating existing installation at %s...${NC}\n" "$target"
+        else
+            printf "${YELLOW}Warning: %s already exists. Overwrite? [y/N]: ${NC}" "$target"
+            read -r reply </dev/tty
+            case "$reply" in
+                [yY]*) ;;
+                *) printf "${RED}Installation aborted.${NC}\n"; exit 1 ;;
+            esac
+        fi
     fi
 
     mv -f "$tmp_dir/$BIN_NAME" "$target"
     chmod +x "$target"
 
-    printf "${GREEN}✓ %s installed to %s${NC}\n" "$BIN_NAME" "$target"
+    if [ "$UPDATE_MODE" = true ]; then
+        printf "${GREEN}✓ %s updated successfully at %s${NC}\n" "$BIN_NAME" "$target"
+    else
+        printf "${GREEN}✓ %s installed to %s${NC}\n" "$BIN_NAME" "$target"
+    fi
 
     # PATH setup
     case ":$PATH:" in
@@ -162,15 +180,20 @@ install_binary() {
             ;;
     esac
 
-    printf "\n${GREEN}✅ Installation complete!${NC}\n"
-    printf "Run: ${YELLOW}%s --help${NC}\n" "$BIN_NAME"
-    
-    if [ -n "${shell_profile:-}" ] && [ -f "$shell_profile" ]; then
-        printf "\n${YELLOW}To use %s immediately, run:${NC}\n" "$BIN_NAME"
-        printf "  ${GREEN}source %s${NC}\n" "$shell_profile"
-        printf "Or restart your terminal.\n"
+    if [ "$UPDATE_MODE" = true ]; then
+        printf "\n${GREEN}✅ Update complete!${NC}\n"
+        printf "Run: ${YELLOW}%s --help${NC}\n" "$BIN_NAME"
     else
-        printf "You may need to restart your terminal.\n"
+        printf "\n${GREEN}✅ Installation complete!${NC}\n"
+        printf "Run: ${YELLOW}%s --help${NC}\n" "$BIN_NAME"
+        
+        if [ -n "${shell_profile:-}" ] && [ -f "$shell_profile" ]; then
+            printf "\n${YELLOW}To use %s immediately, run:${NC}\n" "$BIN_NAME"
+            printf "  ${GREEN}source %s${NC}\n" "$shell_profile"
+            printf "Or restart your terminal.\n"
+        else
+            printf "You may need to restart your terminal.\n"
+        fi
     fi
 }
 
