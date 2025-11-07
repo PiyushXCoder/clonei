@@ -163,7 +163,14 @@ install_binary() {
 
     printf "\n${GREEN}✅ Installation complete!${NC}\n"
     printf "Run: ${YELLOW}%s --help${NC}\n" "$BIN_NAME"
-    printf "You may need to restart your terminal.\n"
+    
+    if [ -n "${shell_profile:-}" ] && [ -f "$shell_profile" ]; then
+        printf "\n${YELLOW}To use %s immediately, run:${NC}\n" "$BIN_NAME"
+        printf "  ${GREEN}source %s${NC}\n" "$shell_profile"
+        printf "Or restart your terminal.\n"
+    else
+        printf "You may need to restart your terminal.\n"
+    fi
 }
 
 install_binary
