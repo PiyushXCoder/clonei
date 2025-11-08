@@ -3,12 +3,14 @@ package cmd
 import (
 	"fmt"
 	"os"
+
 	"os/exec"
 	"strings"
 
 	"github.com/soft4dev/clonei/internal"
 	"github.com/soft4dev/clonei/internal/color"
 	customErrors "github.com/soft4dev/clonei/internal/errors"
+
 	projectHandler "github.com/soft4dev/clonei/internal/projects"
 	"github.com/soft4dev/clonei/internal/utils"
 	"github.com/spf13/cobra"
@@ -17,7 +19,6 @@ import (
 var (
 	projectType string
 	install     bool
-	cd          bool
 )
 
 var rootCmd = &cobra.Command{
@@ -36,6 +37,7 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		// check if git is installed
 		if err := utils.CheckGitInstalled(); err != nil {
 			return customErrors.NewCustomError("Error: git is not installed", customErrors.ErrorTypeError, false)
@@ -90,12 +92,6 @@ var rootCmd = &cobra.Command{
 			color.PrintSuccess("✓ Dependencies installed successfully \n")
 		}
 
-		if cd {
-			if err := os.Chdir(projectDirName); err != nil {
-				return customErrors.NewCustomError(fmt.Sprintf("failed to change directory: %s", err), customErrors.ErrorTypeWarning, false)
-			}
-		}
-
 		color.PrintSuccess("project: %s", projectType)
 		color.PrintSuccess("url: %s", args[0])
 		return nil
@@ -132,5 +128,4 @@ func init() {
 	rootCmd.SilenceUsage = true
 	rootCmd.Flags().StringVarP(&projectType, "project", "p", "AUTO", "Project type (npm, go, rust, etc.). Use AUTO for auto-detection")
 	rootCmd.Flags().BoolVarP(&install, "install", "i", true, "controls whether to install dependencies after clone")
-	rootCmd.Flags().BoolVarP(&cd, "cd", "c", true, "controls whether to change directory into the project folder after clone")
 }
